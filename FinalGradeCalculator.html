@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Final Grade Calculator</title>
+	</head>
+	<script type="text/javascript">
+		function calculateFinalGrade() {
+			var calculateGrade = function(cur, des, weightAsDecimal) {
+				let wgt = weightAsDecimal / 100;
+				return Math.round((cur + (des - cur) / wgt) * 10) / 10;
+			};
+			var errorMessage = function (text) {
+				alert(text);
+			};
+			let currentG = document.getElementById('curGrade').value;
+			let desiredG = document.getElementById('desGrade').value;
+			let finalWgt = document.getElementById('finWgt').value;
+			window.location.hash = currentG + "/" + desiredG + "/" + finalWgt;
+			if (currentG === '') {
+				errorMessage("Please enter your current grade.");
+				return;
+			}
+			currentG = Number(currentG);
+			var checkBounds = function (val, type) {
+				if (Number.isNaN(val) || val < 0 || val > 100) {
+					errorMessage(type + " must be between 0 and 100.");
+					return false;
+				}
+				return true;
+			};
+			if (!checkBounds(currentG, "Current grade")) return;
+			if (finalWgt === '') {
+				errorMessage("Please enter your final's weight.");
+				return;
+			}
+			finalWgt = Number(finalWgt);
+			if (!checkBounds(finalWgt, "Final weight")) return;
+			let gi = document.getElementById('gradeInfo');
+			gi.innerHTML = '';
+			if (desiredG === '') {
+				var gradeTable = document.createElement('table');
+				let topTr = document.createElement('tr');
+				topTr.style.fontWeight = 'bold';
+				gradeTable.setAttribute('border', 1);
+				topTr.innerHTML = "<td>Desired Grade</td><td>Required Score on Final</td>";
+				gradeTable.insertBefore(topTr, null);
+				for (let i = 60; i <= 100; i = i + 2) {
+					let entryTr = document.createElement('tr');
+					let desiredGradeTd = document.createElement('td');
+					desiredGradeTd.innerText = i + " %";
+					desiredGradeTd.style.textAlign = "right";
+					entryTr.insertBefore(desiredGradeTd, null);
+					let requiredScoreTd = document.createElement('td');
+					let requiredScore = calculateGrade(currentG, i, finalWgt);
+					requiredScoreTd.style.backgroundColor = requiredScore >= 0 && requiredScore <= 100 ? '#80ff80' : '#ffa0a0';
+					requiredScoreTd.innerText = requiredScore + " %";
+					requiredScoreTd.style.textAlign = "left";
+					entryTr.insertBefore(requiredScoreTd, null);
+					gradeTable.insertBefore(entryTr, null);
+				}
+				gi.insertBefore(gradeTable, null);
+			} else {
+				desiredG = Number(desiredG);
+				if (!checkBounds(desiredG, "Desired grade")) return;
+				let requiredScore = calculateGrade(currentG, desiredG, finalWgt);
+				gi.innerText = "You will need a score of " + requiredScore + " % on your final. Keep studying!";
+			}
+		}
+	</script>
+	<body>
+		<h1>Final Grade Calculator</h1>
+		<p>Your current grade: <input type="text" id="curGrade" /> %</p>
+		<p>Your desired grade: <input type="text" id="desGrade" /> % (leave
+		empty to generate table)</p>
+		<p>Your final is <input type="text" value="20" id="finWgt" /> % of your
+		grade.</p>
+		<input type="button" value="Calculate required grade"
+		onclick="calculateFinalGrade(); return false;" />
+		<div id="gradeInfo" style="margin-top: 8px;"></div>
+		<p><a href=".">Back to Home Page</a></p>
+	</body>
+</html>
